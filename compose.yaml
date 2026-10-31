@@ -1,0 +1,53 @@
+# Local log stack for the Blob_storage system: Grafana on http://localhost:3001.
+# Alloy reads the logs of the other stacks' containers from Docker, Loki stores
+# them, Grafana shows them. Start it any time; it picks up containers as they
+# come and go. Joins the shared "blob-storage" network (made by auth_service).
+name: blob-observability
+
+services:
+  loki:
+    image: grafana/loki:3.5.0
+    command: -config.file=/etc/loki/config.yaml
+    volumes:
+      - ./loki/config.yaml:/etc/loki/config.yaml:ro
+      - loki-data:/loki
+    # Only on this machine: for scripts and LogCLI. Grafana uses the network.
+    ports:
+      - "127.0.0.1:3100:3100"
+
+  alloy:
+    image: grafana/alloy:v1.9.1
+    command: run --server.http.listen-addr=0.0.0.0:12345 /etc/alloy/config.alloy
+    volumes:
+      - ./alloy/config.alloy:/etc/alloy/config.alloy:ro
+      # Read-only: Alloy lists containers and reads their logs, nothing else.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "127.0.0.1:12345:12345"
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:12.0.0
+    environment:
+      # Dev only: no login, everyone is admin. Never expose this port publicly.
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/blob-system.json
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3001:3000"
+    depends_on:
+      - loki
+
+volumes:
+  loki-data:
+
+networks:
+  default:
+    name: blob-storage
+    external: true
