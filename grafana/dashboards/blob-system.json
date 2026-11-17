@@ -58,7 +58,7 @@
       "gridPos": {
         "x": 0,
         "y": 0,
-        "w": 6,
+        "w": 5,
         "h": 4
       },
       "targets": [
@@ -111,9 +111,9 @@
         "uid": "loki"
       },
       "gridPos": {
-        "x": 6,
+        "x": 5,
         "y": 0,
-        "w": 6,
+        "w": 5,
         "h": 4
       },
       "targets": [
@@ -159,6 +159,61 @@
     },
     {
       "type": "stat",
+      "title": "Failed MFA codes",
+      "description": "auth \"mfa failed\": wrong or reused codes, and step-two tokens that expired or had too many wrong codes. See the MFA lockout runbook.",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 10,
+        "y": 0,
+        "w": 5,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "expr": "sum(count_over_time({container=\"auth\"} | json | message=\"mfa failed\" [$__range]))",
+          "queryType": "instant"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background",
+        "graphMode": "none"
+      },
+      "id": 10
+    },
+    {
+      "type": "stat",
       "title": "Refresh token reuse",
       "description": "A rotated refresh token was used again; all of that user's sessions were revoked. Possible token theft.",
       "datasource": {
@@ -166,9 +221,9 @@
         "uid": "loki"
       },
       "gridPos": {
-        "x": 12,
+        "x": 15,
         "y": 0,
-        "w": 6,
+        "w": 5,
         "h": 4
       },
       "targets": [
@@ -221,9 +276,9 @@
         "uid": "loki"
       },
       "gridPos": {
-        "x": 18,
+        "x": 20,
         "y": 0,
-        "w": 6,
+        "w": 4,
         "h": 4
       },
       "targets": [
@@ -233,7 +288,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(count_over_time({container=~\"gateway|auth\"} | json | message=~\"rate limited|login rate limited\" [$__range]))",
+          "expr": "sum(count_over_time({container=~\"gateway|auth\"} | json | message=~\"rate limited|login rate limited|mfa rate limited\" [$__range]))",
           "queryType": "instant"
         }
       ],
