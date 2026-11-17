@@ -116,6 +116,8 @@ This stack is for development: no login, one Loki process on local disk. In prod
 
 CI runs both on every push.
 
+**Security** (`.github/workflows/security.yml`, on every PR, on push to `main` and weekly): gitleaks checks the whole git history for secrets, and CodeQL analyses the scripts and the workflow files. Findings appear under the repo's **Security → Code scanning**. Dependabot (`.github/dependabot.yml`) opens weekly update PRs for the images in `compose.yaml` and the GitHub Actions. It skips releases younger than 14 days.
+
 ## PR rules
 
 Same as auth_service: branches are named `<feat|fix|docs|chore>/<issue number>-short-slug`, and a PR needs a type label (`feature`, `enhancement`, `bug`, `documentation`) and a reference to an open issue. With Claude Code, "ship this" uses the `ship-pr` skill in `.claude/skills/`.
