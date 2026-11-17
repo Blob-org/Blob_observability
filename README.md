@@ -38,8 +38,9 @@ Then start the other stacks as usual (see Blob_frontend's README) and use the ap
 | --- | --- |
 | Gateway 502s | The gateway couldn't reach auth or blob, e.g. a stack isn't running. |
 | Failed logins | Wrong password or unknown email. A spike can mean password guessing. |
+| Failed MFA codes | Wrong or reused two-factor codes, and sign-ins that expired or ran out of tries at the code step. Many for one user can mean a lost phone, or someone with their password guessing codes. |
 | Refresh token reuse | A rotated refresh token was used again, so auth_service revoked all that user's sessions. Can mean a stolen token. Should be 0. |
-| Rate limited | Requests refused by the gateway's or auth_service's rate limit. |
+| Rate limited | Requests refused by the gateway's or auth_service's rate limit (login and the MFA code step). |
 | Requests per second, Server errors (5xx), Latency p95 | Per service, from each service's `request` log line (`status`, `ms`). |
 | Warnings and errors | Count per service and message. |
 | Logs | The raw lines. Type a request id in **Request id** at the top to see only that request, across every service. |
@@ -72,6 +73,9 @@ In Grafana, open **Explore** and pick Loki. Each line has these labels:
 
 # Failed logins per minute
 sum(count_over_time({container="auth"} | json | message="login failed" [1m]))
+
+# Failed MFA codes per reason
+sum by (reason) (count_over_time({container="auth"} | json | message="mfa failed" [1h]))
 ```
 
 Without Grafana: `curl -G localhost:3100/loki/api/v1/query_range --data-urlencode 'query={container="auth"}' | jq`.
