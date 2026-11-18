@@ -11,6 +11,10 @@ permissions:
 jobs:
   branch-name:
     name: branch-name
+    # Dependabot names its branches dependabot/<ecosystem>/<package>.
+    if: >
+      (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]')
+      || (github.event_name == 'push' && github.actor != 'dependabot[bot]')
     runs-on: ubuntu-latest
     steps:
       - name: Require <type>/<issue>-slug
