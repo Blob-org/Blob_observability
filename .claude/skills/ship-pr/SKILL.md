@@ -5,7 +5,7 @@ description: Ship work from Blob_observability as a pull request that passes the
 
 # Ship a PR
 
-This repo is `rades12340/Blob_observability`, and `main` is protected: nothing reaches it except through a PR whose four required checks pass. `.github/workflows/pr-checks.yml` runs two of them:
+This repo is `Blob-org/Blob_observability`, and `main` is protected: nothing reaches it except through a PR whose four required checks pass. `.github/workflows/pr-checks.yml` runs two of them:
 
 - **labels**: the PR needs at least one of `feature`, `enhancement`, `bug` or `documentation`. Any of `wontfix`, `invalid` or `duplicate` fails it.
 - **issue**: the PR must reference an **open issue**, not a PR. `scripts/check-issue.ts` looks for `#N` in the PR title or description (so `Closes #N` counts), then for a branch named like `feat/N-short-desc`.
@@ -130,7 +130,7 @@ Editing the label or description re-runs `pr-checks` automatically, because the 
 ## When `gh` isn't available
 
 If `gh` is missing or not logged in (`gh auth status`), push with git. Then give the user:
-- the compare URL `https://github.com/rades12340/Blob_observability/compare/main...<branch>?expand=1`
+- the compare URL `https://github.com/Blob-org/Blob_observability/compare/main...<branch>?expand=1`
 - the title, label and body to paste
 
 Suggest `brew install gh && gh auth login` so this works next time.
